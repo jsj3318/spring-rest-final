@@ -1,5 +1,6 @@
 package com.nhnacademy.springrestfinal.config;
 
+import com.nhnacademy.springrestfinal.converter.Member2CsvConverter;
 import com.nhnacademy.springrestfinal.resolver.PageableResolver;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -18,7 +19,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-
+        converters.add(new Member2CsvConverter());
     }
 
 }
