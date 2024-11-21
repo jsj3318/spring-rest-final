@@ -3,6 +3,7 @@ package com.nhnacademy.springrestfinal.domain;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Getter
 public class Member {
@@ -24,6 +25,10 @@ public class Member {
         this.password = password;
         this.age = age;
         this.role = role;
+    }
+
+    public void passwordEncode(PasswordEncoder passwordEncoder) {
+        password = passwordEncoder.encode(password);
     }
 
 }
