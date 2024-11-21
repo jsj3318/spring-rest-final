@@ -16,9 +16,14 @@ Content-Type: text/csv
 
 jsj,조승주,1234,25,member
 
-### 멤버 조회 marco - json
+### 멤버 조회 marco xml
 GET localhost:8080/members/marco
+Accept: application/xml
 
 ### 멤버 조회 jsj - csv
 GET localhost:8080/members/jsj
 Accept: text/csv
+
+### 멤버 조회 전체 - xml
+GET localhost:8080/members
+Accept: application/xml
