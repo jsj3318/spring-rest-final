@@ -1,0 +1,24 @@
+### 멤버 생성 marco - json
+POST localhost:8080/members
+Content-Type: application/json
+
+{
+  "id": "marco",
+  "name": "마르코",
+  "password": "4444",
+  "age": 444,
+  "role": "admin"
+}
+
+### 멤버 생성 jsj - csv
+POST localhost:8080/members
+Content-Type: text/csv
+
+jsj,조승주,1234,25,member
+
+### 멤버 조회 marco - json
+GET localhost:8080/members/marco
+
+### 멤버 조회 jsj - csv
+GET localhost:8080/members/jsj
+Accept: text/csv
