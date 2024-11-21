@@ -3,6 +3,7 @@ package com.nhnacademy.springrestfinal.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -15,8 +16,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        // http 멤버 조작 테스트용 인증 끄기
-//        http.csrf(AbstractHttpConfigurer::disable);
+        // CSRF 토큰 비활성화
+        http.csrf(AbstractHttpConfigurer::disable);
 
         // 페이지 권한 설정
         http.authorizeHttpRequests(
@@ -30,7 +31,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
         );
 
-        // 로그인 폼 설정
+        // 로그인 설정
         http.formLogin(
                 formLogin ->
                         formLogin.loginPage("/login")
@@ -38,6 +39,15 @@ public class SecurityConfig {
                                 .passwordParameter("pwd")
                                 .loginProcessingUrl("/login/process")
         );
+
+        // 로그아웃 설정
+        http.logout(
+                logout->
+                        logout
+                                .deleteCookies("SESSION")
+                .invalidateHttpSession(true)
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/"));
 
         return http.build();
     }
