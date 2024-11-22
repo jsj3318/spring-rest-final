@@ -4,6 +4,7 @@ import com.nhnacademy.springrestfinal.filter.UserAuthenticationFilter;
 import com.nhnacademy.springrestfinal.handler.CustomAuthenticationFailureHandler;
 import com.nhnacademy.springrestfinal.handler.CustomAuthenticationSuccessHandler;
 import com.nhnacademy.springrestfinal.handler.CustomLogoutHandler;
+import com.nhnacademy.springrestfinal.handler.LoginFailCounter;
 import com.nhnacademy.springrestfinal.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -20,6 +21,7 @@ public class SecurityConfig {
 
     private final RedisTemplate<String, Object> redisTemplate;
     private final MemberService memberService;
+    private final LoginFailCounter loginFailCounter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -46,8 +48,8 @@ public class SecurityConfig {
                                 .usernameParameter("id")
                                 .passwordParameter("pwd")
                                 .loginProcessingUrl("/login/process")
-                                .successHandler(new CustomAuthenticationSuccessHandler(redisTemplate))
-                                .failureHandler(new CustomAuthenticationFailureHandler(redisTemplate))
+                                .successHandler(new CustomAuthenticationSuccessHandler(redisTemplate, loginFailCounter))
+                                .failureHandler(new CustomAuthenticationFailureHandler(redisTemplate, loginFailCounter))
         );
 
         // 로그아웃 설정
