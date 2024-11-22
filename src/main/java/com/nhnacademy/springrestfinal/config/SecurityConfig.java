@@ -3,6 +3,7 @@ package com.nhnacademy.springrestfinal.config;
 import com.nhnacademy.springrestfinal.filter.UserAuthenticationFilter;
 import com.nhnacademy.springrestfinal.handler.CustomAuthenticationFailureHandler;
 import com.nhnacademy.springrestfinal.handler.CustomAuthenticationSuccessHandler;
+import com.nhnacademy.springrestfinal.handler.CustomLogoutHandler;
 import com.nhnacademy.springrestfinal.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -54,9 +55,11 @@ public class SecurityConfig {
                 logout->
                         logout
                                 .deleteCookies("SESSION")
-                .invalidateHttpSession(true)
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/"));
+                                .invalidateHttpSession(true)
+                                .logoutUrl("/logout")
+                                .logoutSuccessUrl("/")
+                                .addLogoutHandler(new CustomLogoutHandler(redisTemplate))
+        );
 
         // 에러 페이지 설정
         http
