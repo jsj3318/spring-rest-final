@@ -1,17 +1,24 @@
 package com.nhnacademy.springrestfinal.config;
 
+import com.nhnacademy.springrestfinal.filter.UserAuthenticationFilter;
+import com.nhnacademy.springrestfinal.handler.CustomAuthenticationFailureHandler;
+import com.nhnacademy.springrestfinal.handler.CustomAuthenticationSuccessHandler;
+import com.nhnacademy.springrestfinal.service.MemberService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
-import org.springframework.security.config.Customizer;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final RedisTemplate<String, Object> redisTemplate;
+    private final MemberService memberService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -27,7 +34,7 @@ public class SecurityConfig {
                         .requestMatchers("/member/**").hasAuthority("ROLE_MEMBER")
                         .requestMatchers("/google/**").hasRole("GOOGLE")
                         .requestMatchers("/login").permitAll()
-                        .requestMatchers("/members/**").permitAll() // 멤버 조작 http
+                        .requestMatchers("/members/**").permitAll() // 멤버 조작 http를 실행하기 위함
                         .anyRequest().authenticated()
         );
 
@@ -38,6 +45,8 @@ public class SecurityConfig {
                                 .usernameParameter("id")
                                 .passwordParameter("pwd")
                                 .loginProcessingUrl("/login/process")
+                                .successHandler(new CustomAuthenticationSuccessHandler(redisTemplate))
+                                .failureHandler(new CustomAuthenticationFailureHandler(redisTemplate))
         );
 
         // 로그아웃 설정
@@ -54,13 +63,15 @@ public class SecurityConfig {
                 .exceptionHandling()
                 .accessDeniedPage("/403");
 
+        // 세션 쿠키를 읽어서 이미 로그인 한 걸 검사하는 필터 추가
+        http
+                .addFilterBefore(new UserAuthenticationFilter(redisTemplate, memberService),
+                        UsernamePasswordAuthenticationFilter.class);
+
 
         return http.build();
     }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+
 
 }
