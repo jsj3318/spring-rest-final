@@ -1,22 +1,23 @@
 package com.nhnacademy.springrestfinal.domain;
 
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
-public class OAuthUser implements OAuth2User {
+@Getter
+public class AcademyOAuthUser implements OAuth2User {
     private String id;
     private String name;
     private String email;
     private Role role;
     private Map<String, Object> attributes;
 
-    public OAuthUser(OAuth2User oAuth2User) {
+    public AcademyOAuthUser(OAuth2User oAuth2User) {
         id = (String) oAuth2User.getName();
         name = (String) oAuth2User.getAttribute("name");
         email = (String) oAuth2User.getAttribute("email");
@@ -35,8 +36,4 @@ public class OAuthUser implements OAuth2User {
         return Arrays.asList(new SimpleGrantedAuthority(role));
     }
 
-    @Override
-    public String getName() {
-        return name;
-    }
 }

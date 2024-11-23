@@ -6,6 +6,7 @@ import com.nhnacademy.springrestfinal.handler.CustomAuthenticationFailureHandler
 import com.nhnacademy.springrestfinal.handler.CustomAuthenticationSuccessHandler;
 import com.nhnacademy.springrestfinal.handler.CustomLogoutHandler;
 import com.nhnacademy.springrestfinal.handler.LoginFailCounter;
+import com.nhnacademy.springrestfinal.service.CustomOAuth2UserService;
 import com.nhnacademy.springrestfinal.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -23,6 +24,7 @@ public class SecurityConfig {
     private final RedisTemplate<String, Object> redisTemplate;
     private final MemberService memberService;
     private final LoginFailCounter loginFailCounter;
+    private final CustomOAuth2UserService customOAuth2UserService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -54,8 +56,12 @@ public class SecurityConfig {
                                 .failureHandler(new CustomAuthenticationFailureHandler(redisTemplate, loginFailCounter, memberService))
         )
                 .oauth2Login(oauth2 -> oauth2
-                                .loginPage("/login") // OAuth2 로그인도 같은 로그인 페이지 사용
-                                .defaultSuccessUrl("/")); // OAuth2 로그인 성공 후 리디렉션
+                                .loginPage("/login")
+                                .defaultSuccessUrl("/")
+                        .userInfoEndpoint(userInfo ->
+                                userInfo.userService(customOAuth2UserService)
+                        )
+                );
 
         // 로그아웃 설정
         http.logout(
