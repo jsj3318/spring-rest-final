@@ -20,6 +20,17 @@ public class CustomLogoutHandler implements LogoutHandler {
         for (Cookie cookie : cookies) {
             if (cookie.getName().equals("SESSION")) {
                 sessionId = cookie.getValue();
+
+                // 아이디 읽어서 구글이면 구글 유저 객체까지 제거
+                Object userId = redisTemplate.opsForValue().get(sessionId);
+                if(userId != null) {
+                    String userKey = userId.toString();
+                    if(userKey.contains("GOOGLE:")) {
+                        String GoogleId = userKey.substring("GOOGLE:".length());
+                        redisTemplate.delete("GOOGLE_USER:" + GoogleId);
+                    }
+                }
+
                 redisTemplate.delete(sessionId);
             }
         }

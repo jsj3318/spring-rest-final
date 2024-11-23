@@ -1,6 +1,8 @@
 package com.nhnacademy.springrestfinal.filter;
 
+import com.nhnacademy.springrestfinal.domain.AcademyOAuthUser;
 import com.nhnacademy.springrestfinal.domain.AcademyUser;
+import com.nhnacademy.springrestfinal.domain.GoogleMember;
 import com.nhnacademy.springrestfinal.domain.Member;
 import com.nhnacademy.springrestfinal.service.MemberService;
 import jakarta.servlet.FilterChain;
@@ -43,13 +45,23 @@ public class UserAuthenticationFilter extends OncePerRequestFilter {
         // 세션쿠키가 존재한다 -> 로그인을 했었다
         if(sessionId != null) {
             Object o = redisTemplate.opsForValue().get(sessionId);
-            String id = (String) o;
-            if(id != null) {
-                Member member = memberService.findById(id);
-                AcademyUser academyUser = new AcademyUser(member);
-                Authentication auth = new PreAuthenticatedAuthenticationToken(academyUser, null, academyUser.getAuthorities());
-                auth.setAuthenticated(true);
-                SecurityContextHolder.getContext().setAuthentication(auth);
+            if(o != null) {
+                String id = (String) o;
+                // id가 GOOGLE: 로 시작할 경우 구글 유저
+                if(id.startsWith("GOOGLE:")){
+                    String googleId = id.substring("GOOGLE:".length());
+                    // 레디스에 저장해놓은 유저 객체를 가져온다 GoogleMember 객체
+                    AcademyOAuthUser oAuthUser = new AcademyOAuthUser((GoogleMember) redisTemplate.opsForValue().get("GOOGLE_USER:" + googleId));
+                    Authentication authentication = new PreAuthenticatedAuthenticationToken(oAuthUser, null, oAuthUser.getAuthorities());
+                    authentication.setAuthenticated(true);
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                } else {
+                    Member member = memberService.findById(id);
+                    AcademyUser academyUser = new AcademyUser(member);
+                    Authentication auth = new PreAuthenticatedAuthenticationToken(academyUser, null, academyUser.getAuthorities());
+                    auth.setAuthenticated(true);
+                    SecurityContextHolder.getContext().setAuthentication(auth);
+                }
             }
         }
 
