@@ -45,4 +45,14 @@ public class MemberController {
         return memberService.findById(memberId);
     }
 
+
+    // 테스트 용 차단 해제
+    @PostMapping("/{memberId}/unblock")
+    public String unblockMember(
+            @PathVariable String memberId
+    ){
+        memberService.unblock(memberId);
+        return memberId + " 차단 해제 됨";
+    }
+
 }

@@ -39,6 +39,7 @@ public class SecurityConfig {
                         .requestMatchers("/google/**").hasRole("GOOGLE")
                         .requestMatchers("/login").permitAll()
                         .requestMatchers("/members/**").permitAll() // 멤버 조작 http를 실행하기 위함
+                        .requestMatchers("/dooray/**").permitAll() // 메세지 보내기
                         .anyRequest().authenticated()
         );
 

@@ -1,6 +1,8 @@
 package com.nhnacademy.springrestfinal.service;
 
+import com.nhnacademy.springrestfinal.client.DooraySendClient;
 import com.nhnacademy.springrestfinal.domain.Member;
+import com.nhnacademy.springrestfinal.domain.MessagePayload;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -14,12 +16,15 @@ import javax.management.openmbean.KeyAlreadyExistsException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.bouncycastle.asn1.x500.style.RFC4519Style.member;
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class MemberService {
     private final RedisTemplate<String ,Object> redisTemplate;
     private final PasswordEncoder passwordEncoder;
+    private final DooraySendClient dooraySendClient;
 
     private String HASH_NAME = "Member:";
     private String BLOCK_NAME = "BlockedMember:";
@@ -72,10 +77,18 @@ public class MemberService {
         return redisTemplate.opsForList().range(BLOCK_NAME, 0, -1).contains(id);
     }
 
-    // 유저 차단
+    // 유저 차단 하고 두레이 알림
     public void block(String id) {
         redisTemplate.opsForList().rightPush(BLOCK_NAME, id);
         log.info("{} : 유저 차단 됨", id);
+
+        // 메신저 알림
+        // https://hook.dooray.com/services/3204376758577275363/3943038317970916921/yXGOie6dRg-oDZiZxzHR5Q
+        Member member = findById(id);
+        MessagePayload messagePayload = new MessagePayload("유저 차단 알림",
+                member.getName() + "(" + member.getId() + ") 유저 차단 됨");
+        dooraySendClient.sendMessage(messagePayload, 3204376758577275363L, 3943038317970916921L, "yXGOie6dRg-oDZiZxzHR5Q");
+
     }
 
     // 유저 차단 해제

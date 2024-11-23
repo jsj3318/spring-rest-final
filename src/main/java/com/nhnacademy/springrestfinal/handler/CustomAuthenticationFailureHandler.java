@@ -18,6 +18,7 @@ public class CustomAuthenticationFailureHandler extends SimpleUrlAuthenticationF
     private LoginFailCounter loginFailCounter;
     private MemberService memberService;
 
+
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
         // 로그인 실패 시 발생하는 이벤트
@@ -30,11 +31,8 @@ public class CustomAuthenticationFailureHandler extends SimpleUrlAuthenticationF
         if(loginFailCounter.getCount(id) >= 5 &&
             !memberService.isBlocked(id)){
 
-            // 아이디 접속 차단
+            // 아이디 접속 차단 & 메신저 알림
             memberService.block(id);
-
-            // 메신저 알림
-
 
         }
 

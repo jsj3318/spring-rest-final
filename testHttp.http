@@ -33,3 +33,15 @@ POST localhost:8080/members
 Content-Type: text/csv
 
 hus,한의석,1234,26,member
+
+### 차단 해제
+POST localhost:8080/members/hus/unblock
+
+### 단순 테스트용 두레이 전송
+POST localhost:8080/dooray/3204376758577275363/3943038317970916921/yXGOie6dRg-oDZiZxzHR5Q
+Content-Type: application/json
+
+{
+  "botName": "1",
+  "text": "1"
+}
