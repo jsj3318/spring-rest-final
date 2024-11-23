@@ -2,10 +2,7 @@ package com.nhnacademy.springrestfinal.config;
 
 import com.nhnacademy.springrestfinal.filter.CheckBlockFilter;
 import com.nhnacademy.springrestfinal.filter.UserAuthenticationFilter;
-import com.nhnacademy.springrestfinal.handler.CustomAuthenticationFailureHandler;
-import com.nhnacademy.springrestfinal.handler.CustomAuthenticationSuccessHandler;
-import com.nhnacademy.springrestfinal.handler.CustomLogoutHandler;
-import com.nhnacademy.springrestfinal.handler.LoginFailCounter;
+import com.nhnacademy.springrestfinal.handler.*;
 import com.nhnacademy.springrestfinal.service.CustomOAuth2UserService;
 import com.nhnacademy.springrestfinal.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -58,6 +55,7 @@ public class SecurityConfig {
                 .oauth2Login(oauth2 -> oauth2
                                 .loginPage("/login")
                                 .defaultSuccessUrl("/")
+                        .successHandler(new CustomOAuth2LoginSuccessHandler(redisTemplate))
                         .userInfoEndpoint(userInfo ->
                                 userInfo.userService(customOAuth2UserService)
                         )
