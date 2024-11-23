@@ -20,10 +20,9 @@ public class CustomLogoutHandler implements LogoutHandler {
         for (Cookie cookie : cookies) {
             if (cookie.getName().equals("SESSION")) {
                 sessionId = cookie.getValue();
+                redisTemplate.delete(sessionId);
             }
         }
-
-        redisTemplate.delete(sessionId);
 
         // SESSION 쿠키 제거
         Cookie cookie = new Cookie("SESSION", null);

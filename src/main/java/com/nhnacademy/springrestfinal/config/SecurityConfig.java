@@ -52,7 +52,10 @@ public class SecurityConfig {
                                 .loginProcessingUrl("/login/process")
                                 .successHandler(new CustomAuthenticationSuccessHandler(redisTemplate, loginFailCounter))
                                 .failureHandler(new CustomAuthenticationFailureHandler(redisTemplate, loginFailCounter, memberService))
-        );
+        )
+                .oauth2Login(oauth2 -> oauth2
+                                .loginPage("/login") // OAuth2 로그인도 같은 로그인 페이지 사용
+                                .defaultSuccessUrl("/")); // OAuth2 로그인 성공 후 리디렉션
 
         // 로그아웃 설정
         http.logout(
@@ -78,6 +81,7 @@ public class SecurityConfig {
                 // 쿠키에 세션 아이디가 저장되어 있는지 검사하는 필터
                 .addFilterBefore(new UserAuthenticationFilter(redisTemplate, memberService),
                         CheckBlockFilter.class);
+
 
 
         return http.build();

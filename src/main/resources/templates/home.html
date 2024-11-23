@@ -25,9 +25,10 @@ Welcome, <span th:text="${loginName}"></span><br />
   admin!!!
 </div>
 
-<div sec:authorize="hasRole('ADMIN') or hasRole('MEMBER')">
-  member or admin
+<div sec:authorize="hasRole('GOOGLE')">
+    google!!!
 </div>
+
 
 </body>
 </html>
