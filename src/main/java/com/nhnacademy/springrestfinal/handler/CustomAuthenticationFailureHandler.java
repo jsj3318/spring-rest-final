@@ -1,5 +1,6 @@
 package com.nhnacademy.springrestfinal.handler;
 
+import com.nhnacademy.springrestfinal.service.MemberService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -15,6 +16,7 @@ import java.io.IOException;
 public class CustomAuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {
     private RedisTemplate<String, Object> redisTemplate;
     private LoginFailCounter loginFailCounter;
+    private MemberService memberService;
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
@@ -25,10 +27,11 @@ public class CustomAuthenticationFailureHandler extends SimpleUrlAuthenticationF
         loginFailCounter.increment(id);
 
         // 카운터 5회가 되면 차단하고 메신저 알림
-        if(loginFailCounter.getCount(id) >= 5){
+        if(loginFailCounter.getCount(id) >= 5 &&
+            !memberService.isBlocked(id)){
 
             // 아이디 접속 차단
-
+            memberService.block(id);
 
             // 메신저 알림
 

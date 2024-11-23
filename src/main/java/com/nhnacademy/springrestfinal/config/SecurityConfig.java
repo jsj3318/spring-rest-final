@@ -1,5 +1,6 @@
 package com.nhnacademy.springrestfinal.config;
 
+import com.nhnacademy.springrestfinal.filter.CheckBlockFilter;
 import com.nhnacademy.springrestfinal.filter.UserAuthenticationFilter;
 import com.nhnacademy.springrestfinal.handler.CustomAuthenticationFailureHandler;
 import com.nhnacademy.springrestfinal.handler.CustomAuthenticationSuccessHandler;
@@ -49,7 +50,7 @@ public class SecurityConfig {
                                 .passwordParameter("pwd")
                                 .loginProcessingUrl("/login/process")
                                 .successHandler(new CustomAuthenticationSuccessHandler(redisTemplate, loginFailCounter))
-                                .failureHandler(new CustomAuthenticationFailureHandler(redisTemplate, loginFailCounter))
+                                .failureHandler(new CustomAuthenticationFailureHandler(redisTemplate, loginFailCounter, memberService))
         );
 
         // 로그아웃 설정
@@ -68,10 +69,14 @@ public class SecurityConfig {
                 .exceptionHandling()
                 .accessDeniedPage("/403");
 
-        // 세션 쿠키를 읽어서 이미 로그인 한 걸 검사하는 필터 추가
+        // 필터 추가
         http
+                // 입력한 아이디가 차단된 아이디인지 검사하는 필터
+                .addFilterBefore(new CheckBlockFilter(memberService),
+                        UsernamePasswordAuthenticationFilter.class)
+                // 쿠키에 세션 아이디가 저장되어 있는지 검사하는 필터
                 .addFilterBefore(new UserAuthenticationFilter(redisTemplate, memberService),
-                        UsernamePasswordAuthenticationFilter.class);
+                        CheckBlockFilter.class);
 
 
         return http.build();

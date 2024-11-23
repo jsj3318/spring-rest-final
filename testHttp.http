@@ -27,3 +27,9 @@ Accept: text/csv
 ### 멤버 조회 전체 - xml
 GET localhost:8080/members
 Accept: application/xml
+
+### 차단 될 예제 유저 추가
+POST localhost:8080/members
+Content-Type: text/csv
+
+hus,한의석,1234,26,member

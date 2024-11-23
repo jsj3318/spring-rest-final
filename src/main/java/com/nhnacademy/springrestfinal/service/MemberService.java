@@ -2,6 +2,7 @@ package com.nhnacademy.springrestfinal.service;
 
 import com.nhnacademy.springrestfinal.domain.Member;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -13,6 +14,7 @@ import javax.management.openmbean.KeyAlreadyExistsException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class MemberService {
@@ -20,6 +22,7 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
 
     private String HASH_NAME = "Member:";
+    private String BLOCK_NAME = "BlockedMember:";
 
     public Member save(Member member) {
         // 이미 존재하는 id 확인
@@ -64,5 +67,21 @@ public class MemberService {
     }
 
 
+    // 차단 여부
+    public boolean isBlocked(String id) {
+        return redisTemplate.opsForList().range(BLOCK_NAME, 0, -1).contains(id);
+    }
+
+    // 유저 차단
+    public void block(String id) {
+        redisTemplate.opsForList().rightPush(BLOCK_NAME, id);
+        log.info("{} : 유저 차단 됨", id);
+    }
+
+    // 유저 차단 해제
+    public void unblock(String id) {
+        redisTemplate.opsForList().remove(BLOCK_NAME,1, id);
+        log.info("{} : 유저 차단 해제 됨", id);
+    }
 
 }
